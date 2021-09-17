@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
@@ -9,18 +10,16 @@ import (
 
 var DB *gorm.DB
 
+var err error
+
 // SetupDB : initializing mysql database
 func SetupDB() *gorm.DB {
-	// DB, err := gorm.Open("mysql", "${DB_USER}:${DB_PASS}@tcp(${DB_HOST}:${DB_PORT})/${DB_NAME}?charset=utf8&parseTime=True&loc=Local")
-	DB, err := gorm.Open("mysql", "root:QWErty@123@tcp(localhost:3306)/todo_schema?charset=utf8&parseTime=True&loc=Local")
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"))
 
+	DB, err = gorm.Open("mysql", dsn)
 	if err != nil {
-		panic(err.Error())
+		fmt.Println("Status:", err)
 	}
-
-	defer DB.Close()
-
-	fmt.Println("database connected")
 
 	return DB
 }
